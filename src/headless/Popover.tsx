@@ -84,6 +84,18 @@ export function Popover({
     }
   }, [isOpen, trigger]);
 
+  useEffect(() => {
+    if (trigger === 'hover') {
+      const onScroll = () => {
+        setIsOpen(false);
+      };
+
+      document.addEventListener('scroll', onScroll);
+
+      return () => document.removeEventListener('scroll', onScroll);
+    }
+  }, [trigger, setIsOpen]);
+
   const memoizedValue = useMemo(
     () => ({
       isOpen,
@@ -105,24 +117,16 @@ export function Popover({
 function Trigger({ children }: PropsWithStrictChildren) {
   const { setContentPosition, isOpen, setIsOpen, contentRef, trigger, triggerRef } = usePopoverContext();
 
-  const onOpen = () => {
-    setIsOpen(true);
-  };
-
-  const onClose = () => {
-    setIsOpen(false);
-  };
-
   const eventHandlers =
     trigger === 'hover'
       ? {
           onMouseEnter: (e: React.MouseEvent) => {
             e.stopPropagation();
-            onOpen();
+            setIsOpen(true);
           },
           onMouseLeave: (e: React.MouseEvent) => {
             e.stopPropagation();
-            onClose();
+            setIsOpen(false);
           },
         }
       : {
@@ -155,7 +159,7 @@ function Trigger({ children }: PropsWithStrictChildren) {
 }
 
 function Content({ children }: PropsWithStrictChildren) {
-  const { contentPosition, isOpen, contentRef, setIsOpen, position, offset, trigger } = usePopoverContext();
+  const { contentPosition, isOpen, contentRef, setIsOpen, position, offset } = usePopoverContext();
 
   const getOffsetValues = (): { mainAxis: number; crossAxis: number } => {
     if (typeof offset === 'number') {
@@ -219,18 +223,6 @@ function Content({ children }: PropsWithStrictChildren) {
         };
     }
   };
-
-  useEffect(() => {
-    if (trigger === 'hover') {
-      const handleScroll = () => {
-        setIsOpen(false);
-      };
-
-      document.addEventListener('scroll', handleScroll);
-
-      return () => document.removeEventListener('scroll', handleScroll);
-    }
-  }, [trigger, setIsOpen]);
 
   return (
     <AnimatePortal isOpen={isOpen}>
