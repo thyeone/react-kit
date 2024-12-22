@@ -1,8 +1,9 @@
 'use client';
 
 import { Slot } from '@radix-ui/react-slot';
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import Portal from './overlay/Portal';
+import { m } from 'framer-motion';
+import React, { RefObject, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import AnimatePortal from './overlay/AnimatePortal';
 
 type DropdownPosition = {
   top: number;
@@ -10,27 +11,26 @@ type DropdownPosition = {
   width: number;
   triggerHeight: number;
   popoverHeight: number;
+  popoverWidth: number;
 };
 
-type ContextValue = {
-  position: DropdownPosition;
-  setPosition: React.Dispatch<React.SetStateAction<DropdownPosition>>;
+type Position = 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+type OffsetValue = number | { mainAxis?: number; crossAxis?: number };
+
+interface PopoverContextType {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  dropDownRef: React.MutableRefObject<HTMLDivElement | null>;
   trigger: 'click' | 'hover';
-};
+  contentPosition: DropdownPosition;
+  setContentPosition: React.Dispatch<React.SetStateAction<DropdownPosition>>;
+  contentRef: RefObject<HTMLDivElement>;
+  triggerRef: RefObject<HTMLDivElement>;
+  position: Position;
+  offset: OffsetValue;
+}
 
-type RenderProps = {
-  isOpen: boolean;
-  onClose: VoidFunction;
-};
-
-type Props = {
-  trigger: 'click' | 'hover';
-};
-
-const PopoverContext = createContext<ContextValue | undefined>(undefined);
+const PopoverContext = createContext<PopoverContextType | null>(null);
 
 function usePopoverContext() {
   const context = useContext(PopoverContext);
@@ -41,39 +41,69 @@ function usePopoverContext() {
   return context;
 }
 
-export function Popover({ children, trigger }: RenderPropsChildren<Props, RenderProps>) {
-  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
+export function Popover({
+  children,
+  trigger = 'click',
+  position = 'bottom',
+  offset = 0,
+}: PropsWithStrictChildren<{
+  trigger?: 'click' | 'hover';
+  position?: Position;
+  offset?: OffsetValue;
+}>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [contentPosition, setContentPosition] = useState<DropdownPosition>({
     top: 0,
     left: 0,
     width: 0,
     triggerHeight: 0,
     popoverHeight: 0,
+    popoverWidth: 0,
   });
-  const [isOpen, setIsOpen] = useState(false);
-  const dropDownRef = useRef<HTMLDivElement>(null);
 
-  const contextValue = useMemo(
+  useEffect(() => {
+    if (trigger === 'click' && isOpen) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          contentRef.current &&
+          !contentRef.current.contains(event.target as Node) &&
+          triggerRef.current &&
+          !triggerRef.current.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen, trigger]);
+
+  const memoizedValue = useMemo(
     () => ({
-      position: dropdownPosition,
-      setPosition: setDropdownPosition,
       isOpen,
       setIsOpen,
-      dropDownRef,
       trigger,
+      contentPosition,
+      setContentPosition,
+      contentRef,
+      triggerRef,
+      position,
+      offset,
     }),
-    [dropdownPosition, isOpen]
+    [isOpen, trigger, contentPosition, position, offset]
   );
 
-  return (
-    <PopoverContext.Provider value={contextValue}>
-      {typeof children === 'function' ? children({ isOpen, onClose: () => setIsOpen(false) }) : children}
-    </PopoverContext.Provider>
-  );
+  return <PopoverContext.Provider value={memoizedValue}>{children}</PopoverContext.Provider>;
 }
 
 function Trigger({ children }: PropsWithStrictChildren) {
-  const { setPosition, isOpen, setIsOpen, dropDownRef, trigger } = usePopoverContext();
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const { setContentPosition, isOpen, setIsOpen, contentRef, trigger, triggerRef } = usePopoverContext();
 
   const onOpen = () => {
     setIsOpen(true);
@@ -103,15 +133,16 @@ function Trigger({ children }: PropsWithStrictChildren) {
         };
 
   useEffect(() => {
-    if (isOpen && triggerRef.current && dropDownRef.current) {
+    if (isOpen && triggerRef.current && contentRef.current) {
       const rect = triggerRef.current?.getBoundingClientRect();
-      const dropdownRect = dropDownRef.current.getBoundingClientRect();
-      setPosition({
+      const dropdownRect = contentRef.current.getBoundingClientRect();
+      setContentPosition({
         top: rect.bottom,
         left: rect.left,
         width: rect.width,
         triggerHeight: rect.height,
         popoverHeight: dropdownRect.height,
+        popoverWidth: dropdownRect.width,
       });
     }
   }, [isOpen]);
@@ -123,17 +154,71 @@ function Trigger({ children }: PropsWithStrictChildren) {
   );
 }
 
-function Content({
-  children,
-  left,
-  renderOver,
-  margin = 10,
-}: PropsWithStrictChildren<{
-  left?: number;
-  renderOver?: boolean;
-  margin?: number;
-}>) {
-  const { position, isOpen, dropDownRef, setIsOpen, trigger } = usePopoverContext();
+function Content({ children }: PropsWithStrictChildren) {
+  const { contentPosition, isOpen, contentRef, setIsOpen, position, offset, trigger } = usePopoverContext();
+
+  const getOffsetValues = (): { mainAxis: number; crossAxis: number } => {
+    if (typeof offset === 'number') {
+      return { mainAxis: offset, crossAxis: 0 };
+    }
+    return {
+      mainAxis: offset.mainAxis ?? 0,
+      crossAxis: offset.crossAxis ?? 0,
+    };
+  };
+
+  const getPositionStyles = () => {
+    const { top, left, width, triggerHeight, popoverHeight, popoverWidth } = contentPosition;
+    const { mainAxis, crossAxis } = getOffsetValues();
+
+    switch (position) {
+      case 'top':
+        return {
+          top: top - popoverHeight - mainAxis - triggerHeight,
+          left: left + (width - popoverWidth) / 2 + crossAxis,
+        };
+      case 'top-left':
+        return {
+          top: top - popoverHeight - mainAxis - triggerHeight,
+          left: left + crossAxis,
+        };
+      case 'top-right':
+        return {
+          top: top - popoverHeight - mainAxis - triggerHeight,
+          left: left + width - popoverWidth + crossAxis,
+        };
+      case 'bottom':
+        return {
+          top: top + mainAxis,
+          left: left + (width - popoverWidth) / 2 + crossAxis,
+        };
+      case 'bottom-left':
+        return {
+          top: top + mainAxis,
+          left: left + crossAxis,
+        };
+      case 'bottom-right':
+        return {
+          top: top + mainAxis,
+          left: left - popoverWidth - crossAxis + width,
+        };
+      case 'left':
+        return {
+          top: top + (triggerHeight - popoverHeight) / 2 + crossAxis,
+          left: left - popoverWidth - mainAxis,
+        };
+      case 'right':
+        return {
+          top: top + (triggerHeight - popoverHeight) / 2 + crossAxis,
+          left: left + width + mainAxis,
+        };
+      default:
+        return {
+          top: top + triggerHeight + mainAxis,
+          left: left + crossAxis,
+        };
+    }
+  };
 
   useEffect(() => {
     if (trigger === 'hover') {
@@ -148,23 +233,19 @@ function Content({
   }, [trigger, setIsOpen]);
 
   return (
-    <Portal>
-      {isOpen && (
-        <div
-          ref={dropDownRef}
-          style={{
-            position: 'fixed',
-            top: renderOver
-              ? position.top - position.popoverHeight - position.triggerHeight - margin
-              : position.top - margin,
-            left: left ? position.left + left : position.left,
-            zIndex: 1000,
-          }}
-        >
-          {children}
-        </div>
-      )}
-    </Portal>
+    <AnimatePortal isOpen={isOpen}>
+      <m.div
+        ref={contentRef}
+        onClick={() => setIsOpen(false)}
+        style={{
+          position: 'fixed',
+          ...getPositionStyles(),
+          zIndex: 1000,
+        }}
+      >
+        {children}
+      </m.div>
+    </AnimatePortal>
   );
 }
 
