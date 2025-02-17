@@ -1,13 +1,16 @@
-import { Fragment } from 'react';
-import Divider from './Divider';
-import { cn } from '../libs/cn';
-import { Flex } from './Flex';
+import { Fragment } from "react";
+import Divider from "./Divider";
+import { cn } from "../libs/cn";
+import { Flex } from "./Flex";
 
-type ListProps<T> = Omit<React.ComponentProps<typeof Flex>, 'children'> & {
+type ListProps<T> = Omit<React.ComponentProps<typeof Flex>, "children"> & {
   data: T[];
-  renderItem: (data: T, index: number) => JSX.Element | boolean | null | undefined;
+  renderItem: (
+    data: T,
+    index: number
+  ) => JSX.Element | boolean | null | undefined;
   renderEmpty?: () => JSX.Element | boolean | null | undefined;
-  direction?: 'row' | 'col';
+  direction?: "row" | "col";
   className?: string;
   nonEmptyClassName?: string;
   divider?: JSX.Element;
@@ -16,11 +19,11 @@ type ListProps<T> = Omit<React.ComponentProps<typeof Flex>, 'children'> & {
   bottomElement?: JSX.Element;
 };
 
-export default function ItemList<T>({
+export function ItemList<T>({
   data,
   renderItem,
   renderEmpty,
-  direction = 'col',
+  direction = "col",
   className,
   nonEmptyClassName,
   divider,
@@ -33,7 +36,7 @@ export default function ItemList<T>({
     <Flex
       direction={direction}
       className={cn(className, {
-        [nonEmptyClassName || '']: data.length,
+        [nonEmptyClassName || ""]: data.length,
       })}
       {...props}
     >

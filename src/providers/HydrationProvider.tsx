@@ -1,13 +1,21 @@
-import type { UseQueryOptions } from '@tanstack/react-query';
-import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { Suspense, cache } from 'react';
+import type { UseQueryOptions } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
+import { Suspense, cache } from "react";
 
 type Props = {
   queries: UseQueryOptions<any, any, any, any>[];
   fallback?: React.ReactNode;
 };
 
-export async function PrefetchHydration({ queries, fallback = null, children }: PropsWithStrictChildren<Props>) {
+export async function PrefetchHydration({
+  queries,
+  fallback = null,
+  children,
+}: PropsWithStrictChildren<Props>) {
   const getQueryClient = cache(() => new QueryClient());
   const queryClient = getQueryClient();
 

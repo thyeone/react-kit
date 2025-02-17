@@ -7,7 +7,9 @@ type ReplaceOptions = {
   path?: string;
 };
 
-export const useQueryParams = <T extends Record<string, string>>() => {
+export const useQueryParams = <
+  T extends Record<string, string | boolean | number>
+>() => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,22 +33,8 @@ export const useQueryParams = <T extends Record<string, string>>() => {
     [location.pathname, searchParams]
   );
 
-  const replaceQuery = useCallback(
-    (key: string, val: string, options?: ReplaceOptions) => {
-      const newPath = getPath(key, val, options);
-
-      if (options?.push) {
-        navigate(newPath);
-        return;
-      }
-
-      navigate(newPath, { replace: true });
-    },
-    [getPath, navigate]
-  );
-
-  const replaceQueries = useCallback(
-    (queries: T, options?: ReplaceOptions) => {
+  const setParams = useCallback(
+    (queries: Partial<T>, options?: ReplaceOptions) => {
       const newParams = new URLSearchParams(searchParams);
 
       if (options?.resetQueries) {
@@ -67,20 +55,22 @@ export const useQueryParams = <T extends Record<string, string>>() => {
         options?.path || location.pathname
       }?${newParams.toString()}`;
 
-      if (options?.push) {
-        navigate(newPath);
-        return;
-      }
-
-      navigate(newPath, { replace: true });
+      navigate(newPath, { replace: !options?.push });
     },
     [location.pathname, searchParams, navigate]
   );
 
-  const query: T = useMemo(() => {
-    const obj: T = {} as T;
+  const query: Partial<T> = useMemo(() => {
+    const obj: Partial<T> = {};
+
     for (const [k, v] of searchParams.entries()) {
-      obj[k as keyof T] = v as T[keyof T];
+      if (v === "true" || v === "false") {
+        obj[k as keyof T] = (v === "true") as T[keyof T];
+      } else if (!isNaN(Number(v))) {
+        obj[k as keyof T] = Number(v) as T[keyof T];
+      } else {
+        obj[k as keyof T] = v as T[keyof T];
+      }
     }
     return obj;
   }, [searchParams]);
@@ -108,8 +98,7 @@ export const useQueryParams = <T extends Record<string, string>>() => {
   );
 
   return {
-    replaceQuery,
-    replaceQueries,
+    setParams,
     getPath,
     query,
     resetQuery,

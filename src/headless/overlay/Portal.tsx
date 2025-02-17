@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
-export default function Portal({ children }: PropsWithStrictChildren) {
+export function Portal({ children }: PropsWithStrictChildren) {
   const [container, setContainer] = useState<HTMLElement | null>(null);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ type SwitchRendererProps<T extends string | number> = {
   defaultComponent?: React.ReactElement | null;
 };
 
-const SwitchRenderer = <T extends string | number>({
+export const SwitchRenderer = <T extends string | number>({
   value,
   caseBy,
   defaultComponent = null,
@@ -15,5 +15,3 @@ const SwitchRenderer = <T extends string | number>({
 
   return caseBy[value] ?? defaultComponent;
 };
-
-export default SwitchRenderer;

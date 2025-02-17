@@ -9,11 +9,11 @@ type DividerProps<T extends React.ElementType> = {
   absolute?: boolean;
 };
 
-export default function Divider<T extends React.ElementType>({
+export const Divider = <T extends React.ElementType>({
   as,
   className,
-  thickness = 'thin',
-  direction = 'horizontal',
+  thickness = "thin",
+  direction = "horizontal",
   flexItem = false,
   absolute,
   ...props

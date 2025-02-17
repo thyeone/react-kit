@@ -1,22 +1,25 @@
-import { memo } from 'react';
-import { cn } from '../libs/cn';
+import { memo } from "react";
+import { cn } from "../libs/cn";
 
 type SpacingProps = React.HTMLAttributes<HTMLDivElement> & {
   children?: never;
-  direction?: 'horizontal' | 'vertical';
+  direction?: "horizontal" | "vertical";
   size: number;
 };
 
-const Spacing = memo(function Spacing({ direction = 'vertical', size, className, ...props }: SpacingProps) {
+export const Spacing = memo(function Spacing({
+  direction = "vertical",
+  size,
+  className,
+  ...props
+}: SpacingProps) {
   return (
     <div
-      className={cn('flex-none', className)}
+      className={cn("flex-none", className)}
       style={{
-        [direction === 'vertical' ? 'height' : 'width']: size + 'px',
+        [direction === "vertical" ? "height" : "width"]: size + "px",
       }}
       {...props}
     />
   );
 });
-
-export default Spacing;

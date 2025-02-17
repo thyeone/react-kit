@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { createContext, useCallback, useContext, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Flex } from './Flex';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '../libs/cn';
+import { createContext, useCallback, useContext, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Flex } from "./Flex";
+import { ChevronDown } from "lucide-react";
+import { cn } from "../libs/cn";
 
 type AccordionContextType = {
   item: Set<string>;
@@ -13,7 +13,10 @@ type AccordionContextType = {
 
 const AccordionContext = createContext<AccordionContextType | null>(null);
 
-export default function Accordion({ children, defaultOpen = [] }: PropsWithStrictChildren<{ defaultOpen?: string[] }>) {
+export const Accordion = ({
+  children,
+  defaultOpen = [],
+}: PropsWithStrictChildren<{ defaultOpen?: string[] }>) => {
   const [item, setItem] = useState<Set<string>>(new Set(defaultOpen));
 
   const setter = useCallback(
@@ -31,13 +34,18 @@ export default function Accordion({ children, defaultOpen = [] }: PropsWithStric
     [item]
   );
 
-  return <AccordionContext.Provider value={{ item, setter }}>{children}</AccordionContext.Provider>;
-}
+  return (
+    <AccordionContext.Provider value={{ item, setter }}>
+      {children}
+    </AccordionContext.Provider>
+  );
+};
 
 export const useAccordion = () => {
   const context = useContext(AccordionContext);
 
-  if (!context) throw new Error('부모 트리에서 AccordionContext를 사용해주세요.');
+  if (!context)
+    throw new Error("부모 트리에서 AccordionContext를 사용해주세요.");
 
   return { ...context };
 };
@@ -50,7 +58,11 @@ function Item({
 }: PropsWithStrictChildren<{
   value: string;
 }>) {
-  return <AccordionItemContext.Provider value={value}>{children}</AccordionItemContext.Provider>;
+  return (
+    <AccordionItemContext.Provider value={value}>
+      {children}
+    </AccordionItemContext.Provider>
+  );
 }
 
 const useAccordionItem = () => {
@@ -74,18 +86,18 @@ function Trigger({
 
   return (
     <Flex
-      align='center'
-      className={cn('w-full cursor-pointer px-16 py-10', containerClassName)}
+      align="center"
+      className={cn("w-full cursor-pointer px-16 py-10", containerClassName)}
       onClick={() => setter(value)}
     >
       {children}
-      <button className='ml-auto'>
+      <button className="ml-auto">
         <ChevronDown
-          name='ArrowDownSLine'
+          name="ArrowDownSLine"
           className={cn(
-            'w-18 transition-transform',
+            "w-18 transition-transform",
             {
-              'rotate-180': item.has(value),
+              "rotate-180": item.has(value),
             },
             buttonClassName
           )}
@@ -108,19 +120,24 @@ function Content({
   const isActive = item.has(label);
 
   return (
-    <motion.div className={cn('h-auto overflow-hidden border-b border-gray-100', containerClassName)}>
+    <motion.div
+      className={cn(
+        "h-auto overflow-hidden border-b border-gray-100",
+        containerClassName
+      )}
+    >
       <AnimatePresence>
         {isActive && (
           <motion.div
-            initial='collapsed'
-            animate='open'
-            exit='collapsed'
+            initial="collapsed"
+            animate="open"
+            exit="collapsed"
             variants={{
-              open: { opacity: 1, height: 'auto' },
+              open: { opacity: 1, height: "auto" },
               collapsed: { opacity: 0, height: 0 },
             }}
           >
-            <div className={cn('py-10', className)}>{children}</div>
+            <div className={cn("py-10", className)}>{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
