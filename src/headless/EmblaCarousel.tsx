@@ -1,5 +1,3 @@
-"use client";
-
 import type { EmblaCarouselType, EmblaOptionsType } from "embla-carousel";
 import AutoHeight from "embla-carousel-auto-height";
 import AutoScroll, {
@@ -63,7 +61,7 @@ const [EmblaProvider, useEmbla] =
 
 export { useEmbla };
 
-export const Root = ({
+const Root = ({
   options,
   scrollOptions,
   autoplayOptions,
@@ -73,31 +71,33 @@ export const Root = ({
   isAutoHeight,
   enableScrollIndexTracking,
   enableKeyboardEvent,
-  children,
   className,
   ...rest
 }: PropsWithStrictChildren<CarouselProps>) => {
   const plugins = () => {
+    const __plugins = [];
     if (isAutoScroll)
-      return [
+      __plugins.push(
         AutoScroll({
           playOnInit: true,
           stopOnInteraction: false,
           speed: 1,
           ...scrollOptions,
-        }),
-      ];
+        })
+      );
 
     if (isAutoPlay)
-      return [
+      __plugins.push(
         Autoplay({
           playOnInit: true,
           stopOnInteraction: false,
           ...autoplayOptions,
-        }),
-      ];
+        })
+      );
 
-    if (isAutoHeight) return [AutoHeight()];
+    if (isAutoHeight) __plugins.push(AutoHeight());
+
+    return __plugins;
   };
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -239,9 +239,7 @@ export const Root = ({
         })}
         className={cn("relative overflow-hidden outline-none", className)}
         {...rest}
-      >
-        {children}
-      </div>
+      />
     </EmblaProvider>
   );
 };
@@ -260,7 +258,7 @@ const Content = ({
   return (
     <div
       ref={emblaRef}
-      className={cn("w-full cursor-default select-none overflow-hidden", {
+      className={cn("w-full cursor-default overflow-hidden select-none", {
         "cursor-grab active:cursor-grabbing lg:cursor-pointer": cursorGrab,
       })}
     >
@@ -279,15 +277,10 @@ const Content = ({
 };
 
 const Item = ({
-  children,
   className,
   ...rest
 }: PropsWithStrictChildren<React.ComponentProps<"div">>) => {
-  return (
-    <div className={cn("min-w-0 shrink-0 grow-0", className)} {...rest}>
-      {children}
-    </div>
-  );
+  return <div className={cn("min-w-0 shrink-0 grow-0", className)} {...rest} />;
 };
 
 export const EmblaCarousel = {

@@ -2,8 +2,16 @@
 
 import { Slot } from '@radix-ui/react-slot';
 import { m } from 'framer-motion';
-import React, { RefObject, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import AnimatePortal from './overlay/AnimatePortal';
+import React, {
+  RefObject,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { AnimatePortal } from './overlay/AnimatePortal';
 
 type DropdownPosition = {
   top: number;
@@ -14,11 +22,19 @@ type DropdownPosition = {
   popoverWidth: number;
 };
 
-type Position = 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+type Position =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right';
 
 type OffsetValue = number | { mainAxis?: number; crossAxis?: number };
 
-interface PopoverContextType {
+type PopoverContextValue = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   trigger: 'click' | 'hover';
@@ -28,9 +44,9 @@ interface PopoverContextType {
   triggerRef: RefObject<HTMLDivElement>;
   position: Position;
   offset: OffsetValue;
-}
+};
 
-const PopoverContext = createContext<PopoverContextType | null>(null);
+const PopoverContext = createContext<PopoverContextValue | null>(null);
 
 function usePopoverContext() {
   const context = useContext(PopoverContext);
@@ -41,7 +57,7 @@ function usePopoverContext() {
   return context;
 }
 
-export function Popover({
+function Root({
   children,
   trigger = 'click',
   position = 'bottom',
@@ -108,14 +124,25 @@ export function Popover({
       position,
       offset,
     }),
-    [isOpen, trigger, contentPosition, position, offset]
+    [isOpen, trigger, contentPosition, position, offset],
   );
 
-  return <PopoverContext.Provider value={memoizedValue}>{children}</PopoverContext.Provider>;
+  return (
+    <PopoverContext.Provider value={memoizedValue}>
+      {children}
+    </PopoverContext.Provider>
+  );
 }
 
 function Trigger({ children }: PropsWithStrictChildren) {
-  const { setContentPosition, isOpen, setIsOpen, contentRef, trigger, triggerRef } = usePopoverContext();
+  const {
+    setContentPosition,
+    isOpen,
+    setIsOpen,
+    contentRef,
+    trigger,
+    triggerRef,
+  } = usePopoverContext();
 
   const eventHandlers =
     trigger === 'hover'
@@ -159,7 +186,8 @@ function Trigger({ children }: PropsWithStrictChildren) {
 }
 
 function Content({ children }: PropsWithStrictChildren) {
-  const { contentPosition, isOpen, contentRef, setIsOpen, position, offset } = usePopoverContext();
+  const { contentPosition, isOpen, contentRef, setIsOpen, position, offset } =
+    usePopoverContext();
 
   const getOffsetValues = (): { mainAxis: number; crossAxis: number } => {
     if (typeof offset === 'number') {
@@ -172,7 +200,8 @@ function Content({ children }: PropsWithStrictChildren) {
   };
 
   const getPositionStyles = () => {
-    const { top, left, width, triggerHeight, popoverHeight, popoverWidth } = contentPosition;
+    const { top, left, width, triggerHeight, popoverHeight, popoverWidth } =
+      contentPosition;
     const { mainAxis, crossAxis } = getOffsetValues();
 
     switch (position) {
@@ -241,5 +270,8 @@ function Content({ children }: PropsWithStrictChildren) {
   );
 }
 
-Popover.Trigger = Trigger;
-Popover.Content = Content;
+export const Popover = {
+  Root,
+  Trigger,
+  Content,
+};

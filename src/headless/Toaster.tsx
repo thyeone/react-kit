@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import AnimatePortal from "./overlay/AnimatePortal";
-import { cn } from "../libs/cn";
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { cn } from '../libs/cn';
+import { AnimatePortal } from './overlay/AnimatePortal';
 
 type Toast = {
   id: number;
   text: string;
-  type: "success" | "fail";
+  type: 'success' | 'fail';
   duration?: number;
 };
 
 type Action =
   | {
-      type: "ADD";
+      type: 'ADD';
       toast: Toast;
     }
   | {
-      type: "REMOVE";
+      type: 'REMOVE';
       id: number;
     };
 
@@ -27,9 +27,9 @@ let listeners: Array<(toasts: Toast[]) => void> = [];
 
 const reducer = (state: Toast[], action: Action): Toast[] => {
   switch (action.type) {
-    case "ADD":
+    case 'ADD':
       return [...state, action.toast];
-    case "REMOVE":
+    case 'REMOVE':
       return state.filter((toast) => toast.id !== action.id);
   }
 };
@@ -46,7 +46,7 @@ const dispatch = (action: Action) => {
 };
 
 export const toast = {
-  show: ({ type, text, duration }: Omit<Toast, "id">) => {
+  show: ({ type, text, duration }: Omit<Toast, 'id'>) => {
     const newToast = {
       id: Date.now(),
       type,
@@ -54,7 +54,7 @@ export const toast = {
       duration: duration ?? 2500,
     };
 
-    dispatch({ type: "ADD", toast: newToast });
+    dispatch({ type: 'ADD', toast: newToast });
 
     setTimeout(() => {
       toast.remove(newToast.id);
@@ -62,7 +62,7 @@ export const toast = {
   },
 
   remove: (id: number) => {
-    dispatch({ type: "REMOVE", id });
+    dispatch({ type: 'REMOVE', id });
   },
 
   subscribe: (listener: (toasts: Toast[]) => void) => {
@@ -95,6 +95,7 @@ export default function Toaster() {
   return (
     <AnimatePortal isOpen={!!toasts.length}>
       <motion.div
+        layout
         variants={variants}
         initial="initial"
         animate="animate"
@@ -111,7 +112,7 @@ export default function Toaster() {
               animate="animate"
               exit="exit"
               className={cn(
-                `pointer-events-none inline-flex h-52 w-full select-none items-center gap-12 rounded-xl bg-gray-700 px-18 text-body-3 font-medium text-white backdrop-blur`
+                `pointer-events-none inline-flex h-52 w-full select-none items-center gap-12 rounded-xl bg-gray-700 px-18 text-body-3 font-medium text-white backdrop-blur`,
               )}
             >
               {text}

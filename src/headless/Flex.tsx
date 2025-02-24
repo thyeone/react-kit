@@ -1,66 +1,98 @@
-import React, { forwardRef } from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { cn } from '../libs/cn';
+import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
+import React, { forwardRef } from "react";
+import { Box, type BoxProps } from "./Box";
 
-export type TagName = keyof React.JSX.IntrinsicElements;
+const flexVariants = cva("flex", {
+  variants: {
+    direction: {
+      row: "flex-row",
+      col: "flex-col",
+    },
+    align: {
+      start: "items-start",
+      center: "items-center",
+      end: "items-end",
+    },
+    justify: {
+      start: "justify-start",
+      center: "justify-center",
+      end: "justify-end",
+      between: "justify-between",
+    },
+    center: {
+      true: "justify-center items-center",
+    },
+  },
+  defaultVariants: {
+    direction: "row",
+  },
+});
 
-export type FlexProps<K extends TagName = 'div'> = Omit<React.ComponentPropsWithoutRef<K>, 'classID'> & {
-  as?: K;
-  asChild?: boolean;
+export type FlexProps<C extends React.ElementType = "div"> = BoxProps<C> & {
   gap?: number;
-  direction?: 'row' | 'col';
-  centered?: boolean;
-  align?: 'start' | 'center' | 'end';
-  justify?: 'start' | 'center' | 'end' | 'between';
+  direction?: "row" | "col";
+  center?: boolean;
+  align?: "start" | "center" | "end";
+  justify?: "start" | "center" | "end" | "between";
 };
 
-const FlexComponent = <K extends TagName = 'div'>(
+const FlexComponent = <C extends React.ElementType = "div">(
   {
     as,
+    component,
     asChild,
     children,
     className,
-    direction = 'row',
-    centered = false,
+    direction = "row",
+    center,
     align,
     justify,
     gap,
     ...props
-  }: FlexProps<K>,
-  ref: React.ForwardedRef<React.ElementRef<K>>
+  }: FlexProps<C>,
+  ref: PolymorphicRef<C>
 ) => {
-  const Element = as || 'div';
-
-  const flexClasses = cn(
-    'flex',
-    { 'flex-row': direction === 'row' },
-    { 'flex-col': direction === 'col' },
-    { 'items-start': align === 'start' },
-    { 'items-center': align === 'center' },
-    { 'items-end': align === 'end' },
-    { 'justify-start': justify === 'start' },
-    { 'justify-center': justify === 'center' },
-    { 'justify-end': justify === 'end' },
-    { 'justify-between': justify === 'between' },
-    { 'justify-center items-center': centered },
-    className
-  );
+  const Element = component ?? as ?? Box;
 
   const componentProps = {
-    ...(as === 'button' && { type: 'button' }),
+    ...(as === "button" && { type: "button" }),
     style: { gap },
-    className: flexClasses,
+    className: flexVariants({
+      direction,
+      align,
+      justify,
+      center,
+      className,
+    }),
     ref,
     ...props,
   };
 
   if (asChild) {
-    return <Slot {...(componentProps as React.HTMLAttributes<HTMLElement>)}>{children}</Slot>;
+    return (
+      <Slot {...(componentProps as React.HTMLAttributes<HTMLElement>)}>
+        {children}
+      </Slot>
+    );
   }
 
   return React.createElement(Element, componentProps, children);
 };
 
-export const Flex = forwardRef(FlexComponent) as <K extends TagName = 'div'>(
-  props: FlexProps<K> & { ref?: React.Ref<React.ElementRef<K>> }
+export const Flex = forwardRef(FlexComponent) as <
+  C extends React.ElementType = "div"
+>(
+  props: FlexProps<C>,
+  ref?: PolymorphicRef<C>
 ) => JSX.Element;
+
+export const Col = <C extends React.ElementType = "div">(
+  props: FlexProps<C>,
+  ref?: PolymorphicRef<C>
+) => <Flex {...props} direction="col" ref={ref} />;
+
+export const Row = <C extends React.ElementType = "div">(
+  props: FlexProps<C>,
+  ref?: PolymorphicRef<C>
+) => <Flex {...props} direction="row" ref={ref} />;

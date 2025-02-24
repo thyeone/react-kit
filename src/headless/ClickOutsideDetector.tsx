@@ -1,29 +1,38 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
-import { useCallback, useEffect, useRef } from "react";
+import { type RefObject, useCallback, useEffect, useRef } from "react";
 
-type Props = {
+type ClickOutsideDetectorProps = {
   onClickOutside: (e: MouseEvent) => void;
+  exceptionElementRef?: RefObject<HTMLElement>[];
 };
 
 export function ClickOutsideDetector({
-  children,
   onClickOutside,
-}: PropsWithStrictChildren<Props>) {
-  const ref = useRef<HTMLDivElement>(null);
+  exceptionElementRef,
+  ...rest
+}: ClickOutsideDetectorProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const onClickScreen = useCallback(
     (e: MouseEvent) => {
       if (
+        exceptionElementRef?.some((ref) =>
+          ref.current?.contains(e.target as Node)
+        )
+      )
+        return;
+
+      if (
         !e.target ||
         !(e.target instanceof Node) ||
-        !ref.current?.contains(e.target)
+        !containerRef.current?.contains(e.target)
       ) {
         onClickOutside?.(e);
       }
     },
-    [children, onClickOutside]
+    [onClickOutside, exceptionElementRef]
   );
 
   useEffect(() => {
@@ -34,5 +43,5 @@ export function ClickOutsideDetector({
     };
   }, [onClickScreen]);
 
-  return <Slot ref={ref}>{children}</Slot>;
+  return <Slot ref={containerRef} {...rest} />;
 }
