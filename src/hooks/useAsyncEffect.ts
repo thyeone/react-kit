@@ -1,14 +1,14 @@
 import { type DependencyList, useEffect } from 'react';
 
-type Function = void | (() => void);
+type Cleanup = void | (() => void);
 
 export function useAsyncEffect<T>(
-  effect: () => Promise<Function>,
+  effect: () => Promise<Cleanup>,
   deps: DependencyList,
 ) {
   useEffect(() => {
     const promise = effect();
-    let cleanup: Function;
+    let cleanup: Cleanup;
 
     promise.then((__cleanup) => {
       cleanup = __cleanup;
