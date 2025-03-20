@@ -20,7 +20,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "api": ["./codegen/__generated__/api_sdk"]
+    }
   },
   "include": ["src"]
 }

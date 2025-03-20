@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
-import { Divider } from './Divider';
-import { cn } from '../libs/cn';
-import { Flex } from './Flex';
+import { Divider } from '@/headless/ui/Divider';
+import { cn } from '@/libs/cn';
+import { Flex } from '@/headless/ui/Flex';
 
 type ListProps<T> = Omit<React.ComponentProps<typeof Flex>, 'children'> & {
   data: T[];
@@ -19,7 +19,7 @@ type ListProps<T> = Omit<React.ComponentProps<typeof Flex>, 'children'> & {
   bottomElement?: JSX.Element;
 };
 
-export function ItemList<T>({
+export function List<T>({
   data,
   renderItem,
   renderEmpty,

@@ -30,10 +30,7 @@ type ObjectPositionProps = Extract<
 type ObjectFitVariants = Record<ObjectFitProps, string>;
 type ObjectPositionVariants = Record<ObjectPositionProps, string>;
 
-const imageVariants = cva<{
-  objectFit: ObjectFitVariants;
-  objectPosition: ObjectPositionVariants;
-}>("", {
+const imageVariants = cva("", {
   variants: {
     objectFit: {
       contain: "object-contain",
@@ -53,6 +50,10 @@ const imageVariants = cva<{
       "bottom-left": "object-bottom-left",
       "bottom-right": "object-bottom-right",
     },
+    fill: {
+      true: "size-full absolute inset-0",
+      false: null,
+    },
   },
 });
 
@@ -63,6 +64,7 @@ type ImageProps = ComponentPropsWithoutRef<"img"> & {
   errorFallback?: ReactNode;
   isError?: boolean;
   isLoading?: boolean;
+  fill?: boolean;
 };
 
 export const Image = forwardRef(function Image(
@@ -81,6 +83,7 @@ export const Image = forwardRef(function Image(
     errorFallback,
     objectFit,
     objectPosition,
+    fill,
     ...rest
   } = props;
   const [_isLoading, setIsLoading] = useState(true);
@@ -109,7 +112,7 @@ export const Image = forwardRef(function Image(
       alt={alt}
       aria-label={alt}
       ref={ref}
-      className={cn(imageVariants({ objectFit, objectPosition }), className)}
+      className={cn(imageVariants({ objectFit, objectPosition, fill }), className)}
       {...rest}
     />
   );
@@ -118,7 +121,7 @@ export const Image = forwardRef(function Image(
     return (
       <>
         {fallback}
-        <div className="invisible absolute">{ImageElement}</div>
+        <div className="absolute invisible">{ImageElement}</div>
       </>
     );
   }

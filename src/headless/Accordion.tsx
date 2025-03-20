@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flex } from "./Flex";
+import { Flex } from "@/headless/ui/Flex";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../libs/cn";
 

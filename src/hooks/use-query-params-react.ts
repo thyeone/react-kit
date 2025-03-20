@@ -1,5 +1,5 @@
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useCallback, useMemo } from "react";
+import { useCallback } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 type ReplaceOptions = {
   resetQueries?: string[];
@@ -8,7 +8,7 @@ type ReplaceOptions = {
 };
 
 export const useQueryParams = <
-  T extends Record<string, string | boolean | number>
+  T extends Record<string, string | boolean | number>,
 >() => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -30,7 +30,7 @@ export const useQueryParams = <
 
       return `${options?.path || location.pathname}?${newParams.toString()}`;
     },
-    [location.pathname, searchParams]
+    [location.pathname, searchParams],
   );
 
   const setParams = useCallback(
@@ -51,29 +51,27 @@ export const useQueryParams = <
         }
       });
 
-      const newPath = `${
-        options?.path || location.pathname
-      }?${newParams.toString()}`;
+      const newPath = `${options?.path || location.pathname}?${newParams.toString()}`;
 
       navigate(newPath, { replace: !options?.push });
     },
-    [location.pathname, searchParams, navigate]
+    [location.pathname, searchParams, navigate],
   );
 
-  const query: Partial<T> = useMemo(() => {
+  const query: Partial<T> = (() => {
     const obj: Partial<T> = {};
 
     for (const [k, v] of searchParams.entries()) {
-      if (v === "true" || v === "false") {
-        obj[k as keyof T] = (v === "true") as T[keyof T];
-      } else if (!isNaN(Number(v))) {
+      if (v === 'true' || v === 'false') {
+        obj[k as keyof T] = (v === 'true') as T[keyof T];
+      } else if (!isNaN(Number(v)) && !v.startsWith('0')) {
         obj[k as keyof T] = Number(v) as T[keyof T];
       } else {
         obj[k as keyof T] = v as T[keyof T];
       }
     }
     return obj;
-  }, [searchParams]);
+  })();
 
   const resetQuery = useCallback(
     (exceptKeys?: string[]) => {
@@ -94,7 +92,7 @@ export const useQueryParams = <
 
       navigate(newPath, { replace: true });
     },
-    [location.pathname, searchParams, navigate]
+    [location.pathname, searchParams, navigate],
   );
 
   return {
