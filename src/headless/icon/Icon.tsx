@@ -1,7 +1,7 @@
-import { forwardRef } from 'react';
-import * as Icons from './svgs';
-import { PolymorphicComponentProps } from '../polymorphics';
-import { Flex, FlexProps } from '../ui/Flex';
+import { forwardRef, lazy, Suspense } from 'react';
+import type * as Icons from './svgs';
+import type { PolymorphicComponentProps } from '@/headless/polymorphics';
+import { Flex, type FlexProps } from '@/headless/ui/Flex';
 
 export type IconName = keyof typeof Icons;
 
@@ -10,7 +10,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
-function IconComponent(props: IconProps, ref: React.Ref<SVGSVGElement>) {
+function IconComponent(props: IconProps) {
   const {
     name,
     width = props.width ?? props.size ?? 24,
@@ -18,19 +18,23 @@ function IconComponent(props: IconProps, ref: React.Ref<SVGSVGElement>) {
     fill = 'none',
     ...rest
   } = props;
-  const IconElement = Icons[name];
+
+  const IconElement = lazy(() =>
+    import(`./svgs/${name}`).then((module) => ({ default: module[name] })),
+  ) as React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
   return (
-    <IconElement
-      ref={ref}
-      width={width}
-      height={height}
-      fill={fill}
-      style={{
-        flexShrink: 0,
-      }}
-      {...rest}
-    />
+    <Suspense>
+      <IconElement
+        width={width}
+        height={height}
+        fill={fill}
+        style={{
+          flexShrink: 0,
+        }}
+        {...rest}
+      />
+    </Suspense>
   );
 }
 
