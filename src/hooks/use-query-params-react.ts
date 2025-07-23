@@ -10,7 +10,7 @@ type ReplaceOptions = {
 export const useQueryParams = <
   T extends Record<string, string | boolean | number>,
 >(
-  initialValue: Readonly<Partial<T>>,
+  initialValue: Readonly<T>,
 ) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -60,7 +60,7 @@ export const useQueryParams = <
     [location.pathname, searchParams, navigate],
   );
 
-  const query: Partial<T> = (() => {
+  const query: T = (() => {
     const obj: Partial<T> = initialValue;
 
     for (const [k, v] of searchParams.entries()) {
@@ -72,7 +72,7 @@ export const useQueryParams = <
         obj[k as keyof T] = v as T[keyof T];
       }
     }
-    return obj;
+    return obj as T;
   })();
 
   const resetQuery = useCallback(

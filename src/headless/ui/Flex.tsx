@@ -1,7 +1,10 @@
-import React, { forwardRef } from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import type { PolymorphicComponentProps, PolymorphicRef } from '@/headless/polymorphics';
 import { cva } from 'class-variance-authority';
+import React, { forwardRef } from 'react';
+import type {
+  PolymorphicComponentProps,
+  PolymorphicRef,
+} from '../polymorphics';
 
 const flexVariants = cva('flex', {
   variants: {
@@ -23,21 +26,26 @@ const flexVariants = cva('flex', {
     center: {
       true: 'justify-center items-center',
     },
+    wrap: {
+      true: 'flex-wrap',
+    },
   },
   defaultVariants: {
     direction: 'row',
   },
 });
 
-export type FlexProps<C extends React.ElementType = 'div'> = PolymorphicComponentProps<C> & {
-  component?: C;
-  asChild?: boolean;
-  gap?: number;
-  direction?: 'row' | 'col';
-  center?: boolean;
-  align?: 'start' | 'center' | 'end';
-  justify?: 'start' | 'center' | 'end' | 'between';
-};
+export type FlexProps<C extends React.ElementType = 'div'> =
+  PolymorphicComponentProps<C> & {
+    component?: C;
+    asChild?: boolean;
+    gap?: number;
+    direction?: 'row' | 'col';
+    center?: boolean;
+    align?: 'start' | 'center' | 'end';
+    justify?: 'start' | 'center' | 'end' | 'between';
+    wrap?: boolean;
+  };
 
 const FlexComponent = <C extends React.ElementType = 'div'>(
   {
@@ -53,7 +61,7 @@ const FlexComponent = <C extends React.ElementType = 'div'>(
     gap,
     ...props
   }: FlexProps<C>,
-  ref: PolymorphicRef<C>
+  ref: PolymorphicRef<C>,
 ) => {
   const Element = component ?? as ?? 'div';
 
@@ -72,20 +80,36 @@ const FlexComponent = <C extends React.ElementType = 'div'>(
   };
 
   if (asChild) {
-    return <Slot {...(componentProps as React.HTMLAttributes<HTMLElement>)}>{children}</Slot>;
+    return (
+      <Slot {...(componentProps as React.HTMLAttributes<HTMLElement>)}>
+        {children}
+      </Slot>
+    );
   }
 
   return React.createElement(Element, componentProps, children);
 };
 
-export const Flex = forwardRef(FlexComponent) as <C extends React.ElementType = 'div'>(
-  props: FlexProps<C> & { ref?: PolymorphicRef<C> }
+export const Flex = forwardRef(FlexComponent) as <
+  C extends React.ElementType = 'div',
+>(
+  props: FlexProps<C> & { ref?: PolymorphicRef<C> },
 ) => JSX.Element;
 
-export const Col = forwardRef(<C extends React.ElementType = 'div'>(props: FlexProps<C>, ref: PolymorphicRef<C>) => (
-  <Flex {...props} direction='col' ref={ref} />
-)) as <C extends React.ElementType = 'div'>(props: FlexProps<C> & { ref?: PolymorphicRef<C> }) => JSX.Element;
+export const Col = forwardRef(
+  <C extends React.ElementType = 'div'>(
+    props: FlexProps<C>,
+    ref: PolymorphicRef<C>,
+  ) => <Flex {...props} direction="col" ref={ref} />,
+) as <C extends React.ElementType = 'div'>(
+  props: FlexProps<C> & { ref?: PolymorphicRef<C> },
+) => JSX.Element;
 
-export const Row = forwardRef(<C extends React.ElementType = 'div'>(props: FlexProps<C>, ref: PolymorphicRef<C>) => (
-  <Flex {...props} direction='row' ref={ref} />
-)) as <C extends React.ElementType = 'div'>(props: FlexProps<C> & { ref?: PolymorphicRef<C> }) => JSX.Element;
+export const Row = forwardRef(
+  <C extends React.ElementType = 'div'>(
+    props: FlexProps<C>,
+    ref: PolymorphicRef<C>,
+  ) => <Flex {...props} direction="row" ref={ref} />,
+) as <C extends React.ElementType = 'div'>(
+  props: FlexProps<C> & { ref?: PolymorphicRef<C> },
+) => JSX.Element;
