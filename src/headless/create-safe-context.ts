@@ -1,21 +1,21 @@
-import { type Provider, createContext, useContext } from "react";
+import { type Consumer, type Provider, createContext, useContext } from 'react';
 
-const NullSymbol = Symbol("Null");
+const NullSymbol = Symbol('Null');
 
-export type CreateContextReturn<T> = [Provider<T>, () => T];
+export type CreateContextReturn<T> = [Provider<T>, () => T, Consumer<T>];
 
 export function createSafeContext<T>(
-  displayName?: string
+  displayName?: string,
 ): CreateContextReturn<T> {
   const Context = createContext<T | typeof NullSymbol>(NullSymbol);
-  Context.displayName = displayName ?? "SafeContext";
+  Context.displayName = displayName ?? 'SafeContext';
 
   function useSafeContext() {
     const context = useContext(Context);
 
     if (context === NullSymbol) {
       const error = new Error(`[${Context.displayName}]: Provider not found.`);
-      error.name = "[Error] Context";
+      error.name = '[Error] Context';
 
       throw error;
     }
@@ -23,5 +23,9 @@ export function createSafeContext<T>(
     return context;
   }
 
-  return [Context.Provider as Provider<T>, useSafeContext];
+  return [
+    Context.Provider as Provider<T>,
+    useSafeContext,
+    Context.Consumer as Consumer<T>,
+  ];
 }
