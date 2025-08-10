@@ -4,7 +4,10 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 
 const SVG_DIR = path.join(process.cwd(), 'public/svgs');
-const COMPONENT_DIR = path.join(process.cwd(), 'src/headless/icon/svgs');
+const COMPONENT_DIR = path.join(
+  process.cwd(),
+  'src/@iosoft/components/common/icons/svgs',
+);
 
 program
   .option('-c, --current-color', 'SVG 색상을 currentColor로 변환')
@@ -25,7 +28,6 @@ async function generateSvgComponents() {
     for (const file of svgFiles) {
       const componentName = path
         .basename(file, '.svg')
-        .replace(/^Property\s1=/, '')
         .replace(/[^a-zA-Z0-9-]/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '')
@@ -57,6 +59,7 @@ async function generateSvgComponents() {
           exportType: 'named',
           jsxRuntime: 'automatic',
           namedExport: componentName,
+          ref: true,
           svgoConfig: {
             plugins: [
               {
