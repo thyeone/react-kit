@@ -4,10 +4,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 
 const SVG_DIR = path.join(process.cwd(), 'public/svgs');
-const COMPONENT_DIR = path.join(
-  process.cwd(),
-  'src/@iosoft/components/common/icons/svgs',
-);
+const COMPONENT_DIR = path.join(process.cwd(), 'src/headless/icon/svgs');
 
 program
   .option('-c, --current-color', 'SVG 색상을 currentColor로 변환')
