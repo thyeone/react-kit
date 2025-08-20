@@ -27,6 +27,7 @@
     "embla-carousel-auto-scroll": "^8.5.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
+    "embla-kit": "^1.0.7",
     "framer-motion": "^11.18.2",
     "lucide-react": "^0.468.0",
     "overlay-kit": "^1.6.1",
