@@ -45,6 +45,7 @@ export type FlexProps<C extends React.ElementType = 'div'> =
     align?: 'start' | 'center' | 'end';
     justify?: 'start' | 'center' | 'end' | 'between';
     wrap?: boolean;
+    flex?: number;
   };
 
 const FlexComponent = <C extends React.ElementType = 'div'>(
@@ -59,6 +60,8 @@ const FlexComponent = <C extends React.ElementType = 'div'>(
     align,
     justify,
     gap,
+    wrap,
+    flex,
     ...props
   }: FlexProps<C>,
   ref: PolymorphicRef<C>,
@@ -67,12 +70,13 @@ const FlexComponent = <C extends React.ElementType = 'div'>(
 
   const componentProps = {
     ...(as === 'button' && { type: 'button' }),
-    style: { gap },
+    style: { gap, flex },
     className: flexVariants({
       direction,
       align,
       justify,
       center,
+      wrap,
       className,
     }),
     ref,
