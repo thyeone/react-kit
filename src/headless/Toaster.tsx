@@ -1,14 +1,14 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { cn } from '../libs/cn';
 import { AnimatePortal } from './overlay/AnimatePortal';
 
 type Toast = {
   id: number;
   text: string;
-  type: 'success' | 'fail';
+  type?: 'success' | 'fail';
   duration?: number;
 };
 
@@ -25,10 +25,12 @@ type Action =
 let toastMemory: Toast[] = [];
 let listeners: Array<(toasts: Toast[]) => void> = [];
 
+const TOAST_LIMIT_POLICY = 5;
+
 const reducer = (state: Toast[], action: Action): Toast[] => {
   switch (action.type) {
     case 'ADD':
-      return [...state, action.toast];
+      return [...state, action.toast].slice(0, TOAST_LIMIT_POLICY);
     case 'REMOVE':
       return state.filter((toast) => toast.id !== action.id);
   }
@@ -60,11 +62,31 @@ export const toast = {
       toast.remove(newToast.id);
     }, newToast.duration);
   },
-
+  success: ({ text, duration }: Omit<Toast, 'id'>) => {
+    dispatch({
+      type: 'ADD',
+      toast: {
+        type: 'success',
+        id: Date.now(),
+        text,
+        duration: duration ?? 2500,
+      },
+    });
+  },
+  fail: ({ text, duration }: Omit<Toast, 'id'>) => {
+    dispatch({
+      type: 'ADD',
+      toast: {
+        type: 'fail',
+        id: Date.now(),
+        text,
+        duration: duration ?? 2500,
+      },
+    });
+  },
   remove: (id: number) => {
     dispatch({ type: 'REMOVE', id });
   },
-
   subscribe: (listener: (toasts: Toast[]) => void) => {
     listeners = [...listeners, listener];
     return () => {
@@ -73,8 +95,6 @@ export const toast = {
   },
 };
 
-const TOAST_LIMIT_POLICY = 5;
-
 const variants = {
   initial: { opacity: 0, y: 50 },
   animate: { opacity: 1, y: 0 },
@@ -82,15 +102,11 @@ const variants = {
 };
 
 export default function Toaster() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = toast.subscribe((state) => {
-      setToasts(state.slice(0, TOAST_LIMIT_POLICY));
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const toasts = useSyncExternalStore<Toast[]>(
+    toast.subscribe,
+    () => toastMemory,
+    () => toastMemory,
+  );
 
   return (
     <AnimatePortal isOpen={!!toasts.length}>
