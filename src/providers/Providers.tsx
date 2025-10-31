@@ -1,8 +1,8 @@
-import { OverlayProvider } from 'overlay-kit';
-import { ReactQueryProvider } from './react-query-provider';
-import { AsyncBoundary } from '@/headless/async-boundary';
-import Toaster from '@/headless/Toaster';
-import FramerLazyMotionProvider from './framer-lazy-motion-provider';
+import { OverlayProvider } from 'overlay-kit'
+import { AsyncBoundary } from '@/headless/async-boundary'
+import { Toaster } from '@/headless/Toaster'
+import FramerLazyMotionProvider from './framer-lazy-motion-provider'
+import { ReactQueryProvider } from './react-query-provider'
 
 export function Providers({ children }: PropsWithStrictChildren) {
   return (
@@ -16,5 +16,5 @@ export function Providers({ children }: PropsWithStrictChildren) {
         </AsyncBoundary>
       </ReactQueryProvider>
     </FramerLazyMotionProvider>
-  );
+  )
 }

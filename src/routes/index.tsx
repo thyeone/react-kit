@@ -1,5 +1,6 @@
 import 'dayjs/locale/ko'
 import { EmblaCarousel } from '@thyeone/embla'
+import { toast } from '@/headless/Toaster'
 
 export default function Index() {
   return (
@@ -8,6 +9,9 @@ export default function Index() {
         stopPropagation: true,
       }}
       className="p-4"
+      onClick={() => {
+        toast.show('Hello')
+      }}
     >
       <EmblaCarousel.Content>
         <EmblaCarousel.Root
