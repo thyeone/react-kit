@@ -6,6 +6,7 @@ import { cn } from '../libs/cn'
 import { AnimatePortal } from './overlay/AnimatePortal'
 
 type Toast = {
+  type: 'SUCCESS' | 'FAIL' | 'DEFAULT'
   id: number
   text: string
 }
@@ -45,7 +46,8 @@ const dispatch = (action: Action) => {
 
 export const toast = {
   show: (text: string) => {
-    const newToast = {
+    const newToast: Toast = {
+      type: 'DEFAULT',
       id: Date.now(),
       text,
     }
@@ -56,11 +58,29 @@ export const toast = {
       toast.remove(newToast.id)
     }, 2500)
   },
-
+  success: (text: string) => {
+    dispatch({
+      type: 'ADD',
+      toast: {
+        type: 'SUCCESS',
+        id: Date.now(),
+        text,
+      },
+    })
+  },
+  fail: (text: string) => {
+    dispatch({
+      type: 'ADD',
+      toast: {
+        type: 'FAIL',
+        id: Date.now(),
+        text,
+      },
+    })
+  },
   remove: (id: number) => {
     dispatch({ type: 'REMOVE', id })
   },
-
   subscribe: (listener: (toasts: Toast[]) => void) => {
     listeners = [...listeners, listener]
     return () => {
