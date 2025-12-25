@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "icon": "tsx src/generate-icons.ts",
-    "icon:current": "tsx src/generate-icons.ts --current-color"
+    "icon:current": "tsx src/generate-icons.ts --current-color",
+    "genapi": "tsx codegen/generate_api.ts"
   },
   "dependencies": {
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -58,6 +59,7 @@
     "globals": "^15.15.0",
     "postcss": "^8.5.2",
     "prettier": "^3.5.2",
+    "swagger-typescript-api": "^13.2.16",
     "tailwindcss": "^4.1.4",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.24.0",

@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { cn } from '../libs/cn'
 import { AnimatePortal } from './overlay/AnimatePortal'
 
@@ -26,8 +26,10 @@ let listeners: Array<(toasts: Toast[]) => void> = []
 
 const reducer = (state: Toast[], action: Action): Toast[] => {
   switch (action.type) {
-    case 'ADD':
-      return [...state, action.toast]
+    case 'ADD': {
+      const __toasts = [...state, action.toast]
+      return __toasts.slice(0, _TOAST_LIMIT_POLICY)
+    }
     case 'REMOVE':
       return state.filter((toast) => toast.id !== action.id)
   }
@@ -89,7 +91,7 @@ export const toast = {
   },
 }
 
-const TOAST_LIMIT_POLICY = 5
+const _TOAST_LIMIT_POLICY = 5
 
 const variants = {
   initial: { opacity: 0, y: 50 },
@@ -98,15 +100,11 @@ const variants = {
 }
 
 export function Toaster() {
-  const [toasts, setToasts] = useState<Toast[]>([])
-
-  useEffect(() => {
-    const unsubscribe = toast.subscribe((state) => {
-      setToasts(state.slice(0, TOAST_LIMIT_POLICY))
-    })
-
-    return () => unsubscribe()
-  }, [])
+  const toasts = useSyncExternalStore<Toast[]>(
+    toast.subscribe,
+    () => toastMemory,
+    () => toastMemory,
+  )
 
   return (
     <AnimatePortal isOpen={!!toasts.length}>

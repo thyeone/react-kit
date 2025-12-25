@@ -1,7 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-  "files": { "ignoreUnknown": false, "includes": ["**", "!**/node_modules"] },
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/node_modules"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "useEditorconfig": false,
@@ -13,12 +23,21 @@
     "attributePosition": "auto",
     "bracketSpacing": true
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": { "noUnusedVariables": "warn", "noEmptyPattern": "off" },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noEmptyPattern": "off"
+      },
       "a11y": "off",
       "style": {
         "noUselessElse": "off",
@@ -43,7 +62,11 @@
         "noArrayIndexKey": "off"
       }
     },
-    "includes": ["**", "!**/dist", "!**/.eslintrc.cjs"]
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/.eslintrc.cjs"
+    ]
   },
   "javascript": {
     "formatter": {

@@ -22,7 +22,8 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "api": ["./codegen/__generated__/api_sdk.ts"]
     }
   },
   "include": ["src", "setupTests.ts"],
