@@ -1,17 +1,24 @@
-import { toast } from '@/headless/Toaster'
+import { useQueryParams } from '@/hooks/use-query-params-react'
+import { createFileRoute } from '@tanstack/react-router'
 import { EmblaCarousel } from '@thyeone/embla'
 import 'dayjs/locale/ko'
 
+export const Route = createFileRoute('/')({
+  component: Index,
+})
+
 export default function Index() {
+  const { query, setParams } = useQueryParams<{
+    name: string
+  }>({
+    name: '',
+  })
   return (
     <EmblaCarousel.Root
       options={{
         stopPropagation: true,
       }}
       className="p-4"
-      onClick={() => {
-        toast.show('Hello')
-      }}
     >
       <EmblaCarousel.Content>
         <EmblaCarousel.Root
@@ -20,7 +27,12 @@ export default function Index() {
           }}
         >
           <EmblaCarousel.Content>
-            <EmblaCarousel.Item className="size-[300px] rounded-md border border-gray-100 bg-gray-50">
+            <EmblaCarousel.Item
+              onClick={() => {
+                setParams({ name: 'test' })
+              }}
+              className="size-[300px] rounded-md border border-gray-100 bg-gray-50"
+            >
               dd
             </EmblaCarousel.Item>
           </EmblaCarousel.Content>
