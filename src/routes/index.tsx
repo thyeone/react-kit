@@ -1,6 +1,6 @@
-import 'dayjs/locale/ko'
-import { EmblaCarousel } from '@thyeone/embla'
 import { toast } from '@/headless/Toaster'
+import { EmblaCarousel } from '@thyeone/embla'
+import 'dayjs/locale/ko'
 
 export default function Index() {
   return (

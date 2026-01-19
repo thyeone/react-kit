@@ -7,10 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "**",
-      "!**/node_modules"
-    ]
+    "includes": ["**", "!**/node_modules"]
   },
   "formatter": {
     "enabled": true,
@@ -26,7 +23,7 @@
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "off"
       }
     }
   },
@@ -62,11 +59,7 @@
         "noArrayIndexKey": "off"
       }
     },
-    "includes": [
-      "**",
-      "!**/dist",
-      "!**/.eslintrc.cjs"
-    ]
+    "includes": ["**", "!**/dist", "!**/.eslintrc.cjs"]
   },
   "javascript": {
     "formatter": {
